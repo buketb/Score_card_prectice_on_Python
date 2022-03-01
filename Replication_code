@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+
+
+# dummy data as example
+age = ['18 to 25','26 to 35','36 to 45','46 to 60','>= 60']
+df = pd.DataFrame(age, columns=['Age Group'])
+df['counts'] = [31234, 30293, 29384, 30192, 27394]
+df['bad'] = [4920, 4123, 3784, 2608, 1479]
+df['good'] = df.counts - df.bad
+
+# calculate WOE
+df['total_distri'] = df.counts/sum(df.counts)
+df['bad_distri'] = df.bad/sum(df.bad)
+df['good_distri'] = df.good/sum(df.good)
+df['WOE'] = np.log(df.good_distri / df.bad_distri)
+df['WOE%'] = df.WOE * 100
+
+#For each independent variable Xi, its corresponding score is:
+#Score_i= (βi × WoE_i + α/n) × Factor + Offset/n
+#Where:
+#βi — logistic regression coefficient for the variable Xi
+#α — logistic regression intercept
+#WoE — Weight of Evidence value for variable Xi
+#n — number of independent variable Xi in the model
+#Factor, Offset — known as scaling parameter, where
+#Factor = pdo/ln(2)
+#Offset = Target Score — (Factor × ln(Target Odds))
+
+Facto = 20 / np.log(2)
+Offset = 600 - Factor * np.log(50)
+print('Factor:', round(Factor,2) '| Offset', round(Offset,2))
+
+#a target score of 600 to mean a 50 to 1 odds of good customer to bad,
+# and an increase of 20 means a doubling odds
